@@ -1,0 +1,53 @@
+---
+title: "Data mining using Wisconsin breast cancer dataset"
+author: "Mehdi Rahmouni"
+date: "January 23, 2017"
+output: html_document
+---
+
+##Load libraries
+```{r}
+library(knitr)
+```
+
+
+##Print SessionInfo(), to enable reproducibility
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+sessionInfo()
+```
+
+
+## Seting up working directory
+
+
+Before we start our data exploration,                                          
+we need to set up our working directory
+
+
+```{r message = FALSE, warning = FALSE}
+setwd("C://Users//Dell/Desktop/DAT640/Project/")
+```
+
+## Data exploration
+
+In this step we start by importing our dataset,                                
+and saving it into a dataframe using read.csv command
+
+```{r message = FALSE, warning = FALSE}
+wisconsin_bcd <- read.csv("breast_cancer_wisconsin.csv", stringsAsFactors = FALSE)
+```
+
+Still in data exploration                                                   
+we start by checking the structure of the dataset                           
+using the str command 
+
+```{r message = FALSE, warning = FALSE}
+str(wisconsin_bcd)
+```
+
+
+## Data exploration
+
+```{r message = FALSE, warning = FALSE}
+head((wisconsin_bcd),6)
+```
