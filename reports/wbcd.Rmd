@@ -2,52 +2,185 @@
 title: "Data mining using Wisconsin breast cancer dataset"
 author: "Mehdi Rahmouni"
 date: "January 23, 2017"
-output: html_document
----
+output:
+  html_document: default
+ ---
 
-##Load libraries
-```{r}
-library(knitr)
+
+```{r, message=FALSE, warning=FALSE}
+library('ProjectTemplate')
+load.project()
 ```
 
 
-##Print SessionInfo(), to enable reproducibility
+```{r, message=FALSE, warning=FALSE}
+setwd("C://Users/Dell/Desktop/Dat640/Project/cancer/data")
+
+```
+
+Load libraries
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(caret)
+library(randomForest)
+library(gbm)
+library(rattle)
+library(pROC)
+library(plyr)
+```
+
+use the variable wbcd to manipulate the dataset
+
+```{r, message=FALSE, warning=FALSE}
+wbcd <- read.csv("C://Users/Dell/Desktop/Dat640/Project/cancer/data/breast_cancer_wisconsin.csv",
+                 header = TRUE)
+```                 
+
+check the dataset structure, variables
+
+```{r}
+str(wbcd)
+```
+
+
+Data exploration
+
+```{r message = FALSE, warning = FALSE}
+head((wbcd),6)
+```
+
+impute id, X 
+
+```{r}
+wbcd$id <- NULL
+wbcd$X <- NULL
+```
+
+assign Benign, Malignant to diagnosis and change type to factor
+
+```{r}
+wbcd$diagnosis <- factor(wbcd$diagnosis, levels = c("B", "M"),
+                         labels = c("Benign", "Malignant"))
+```
+
+verify that id and X are gone
+
+```{r}
+str(wbcd)
+```
+
+check number of observations and percentage
+
+```{r}
+cbind(Frequency = table(wbcd$diagnosis), Percentage = (prop.table(table(wbcd$diagnosis))* 100))
+```
+
+data summary
+
+```{r}
+summary(wbcd)
+```
+
+build the model
+ensure reproducibility with set.seed()
+
+```{r}
+set.seed(1)
+```
+
+build training/testing sets, 70% training, 30% testing
+
+```{r}
+inTrain <- createDataPartition(wbcd$diagnosis, p=0.7, list=FALSE)
+training <- wbcd[inTrain,]
+testing <- wbcd[-inTrain,]
+```
+
+training/testing dimensions
+
+```{r}
+dim(training)
+dim(testing)
+```
+
+outcome distribution in the testing set
+
+```{r}
+table(testing$diagnosis)
+```
+
+build a random forest model using default parameters
+in the caret package
+
+```{r}
+set.seed(1)
+rf_model <- train(diagnosis ~ ., data=training, method="rf")
+rf_model
+```
+
+```{r}
+rf_model$finalModel
+```
+
+performance on testing test
+
+```{r}
+pred_test <- predict(rf_model, testing)
+confusionMatrix(pred_test, testing$diagnosis, positive = "Malignant")
+```
+
+tune Rf model to find best mtry
+using cross-validation
+
+```{r}
+ctrl <- trainControl(method="repeatedcv", repeats=3)
+grid <- expand.grid(mtry = c(1, 2, 3, 5, 7, 10, 15, 20, 30))
+set.seed(1)
+rf_tune_model <- train(diagnosis ~ ., data=training, method="rf", tuneGrid = grid, trControl = ctrl)
+rf_tune_model
+```
+
+```{r}
+rf_tune_model$finalModel
+```
+
+Plot for the new (tuned) mtry value
+
+```{r}
+plot(rf_tune_model)
+```
+
+performance of updated model on testing set
+
+```{r}
+pred_tuned_test <- predict(rf_tune_model, testing)
+confusionMatrix(pred_tuned_test, testing$diagnosis, positive="Malignant")
+```
+
+variable importance
+
+```{r}
+rf_var <- varImp(rf_tune_model)
+plot(rf_var)
+```
+
+ROC curve
+
+```{r}
+rf_roc <- roc(testing$diagnosis,
+              predict(rf_tune_model, testing, type = "prob")[,"Malignant"],
+              levels = rev(levels(testing$diagnosis)))
+roc_value <- auc(rf_roc)
+
+plot.roc(smooth(rf_roc), main = "RF ROC Curve", col = "blue")
+legend("bottom", legend = roc_value, col=c("#1c61b6"), lwd=2)
+
+```
+
+
+Print SessionInfo(), to enable reproducibility
+
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 sessionInfo()
-```
-
-
-## Seting up working directory
-
-
-Before we start our data exploration,                                          
-we need to set up our working directory
-
-
-```{r message = FALSE, warning = FALSE}
-setwd("C://Users//Dell/Desktop/DAT640/Project/")
-```
-
-## Data exploration
-
-In this step we start by importing our dataset,                                
-and saving it into a dataframe using read.csv command
-
-```{r message = FALSE, warning = FALSE}
-wisconsin_bcd <- read.csv("breast_cancer_wisconsin.csv", stringsAsFactors = FALSE)
-```
-
-Still in data exploration                                                   
-we start by checking the structure of the dataset                           
-using the str command 
-
-```{r message = FALSE, warning = FALSE}
-str(wisconsin_bcd)
-```
-
-
-## Data exploration
-
-```{r message = FALSE, warning = FALSE}
-head((wisconsin_bcd),6)
 ```
