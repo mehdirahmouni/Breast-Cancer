@@ -9,12 +9,44 @@ library(gbm)
 library(rattle)
 library(pROC)
 library(plyr)
+library(e1071)
+library(fBasics)
+library(Hmisc)
+library(base)
+library(tidyr)
+library(ggplot2)
 
 #use the variable wbcd to manipulate the dataset
 wbcd <- breast.cancer.wisconsin
 
-#check the dataset structure, variables
-str(wbcd)
+#------------------------------------------------#
+#exploratory data analysis                       #
+#------------------------------------------------#
+
+dim(wbcd) #number of rows and columns
+
+summary(wbcd) #6 number summary
+
+colnames(wbcd)[colSums(is.na(wbcd)) > 0] #find which column contains missing values
+
+sapply(wbcd,skewness) #skewness
+
+sapply(wbcd,kurtosis) #kurtosis
+
+#histogram plots
+wbcd <- wbcd[, -1] %>%
+  gather(measure, value, radius_mean:fractal_dimension_worst)
+
+ggplot(data = wbcd, aes(x = value, fill = diagnosis, color = diagnosis)) +
+  geom_density(alpha = 0.3, size = 1) +
+  geom_rug() +
+  scale_fill_brewer(palette = "Set2") +
+  scale_color_brewer(palette = "Set2") +
+  facet_wrap( ~ measure, scales = "free_y", ncol = 3)
+
+#-----------------------------------------#
+#data transformation                      #    
+#-----------------------------------------#
 
 #impute id, X 
 wbcd$id <- NULL
@@ -24,7 +56,7 @@ wbcd$X <- NULL
 wbcd$diagnosis <- factor(wbcd$diagnosis, levels = c("B", "M"),
                          labels = c("Benign", "Malignant"))
 
-#verify 
+#verify transformation 
 str(wbcd)
 
 #it is important to check for 
@@ -76,18 +108,22 @@ plot(rf_tune_model)
 
 #performance of updated model on testing set
 pred_tuned_test <- predict(rf_tune_model, testing)
+
 confusionMatrix(pred_tuned_test, testing$diagnosis, positive="Malignant")
 
 #variable importance
 rf_var <- varImp(rf_tune_model)
 plot(rf_var)
+
 #ROC curve
 rf_roc <- roc(testing$diagnosis,
               predict(rf_tune_model, testing, type = "prob")[,"Malignant"],
               levels = rev(levels(testing$diagnosis)))
 roc_value <- auc(rf_roc)
 
+#plot ROC curve
 plot.roc(smooth(rf_roc), main = "RF ROC Curve", col = "blue")
+
 legend("bottom", legend = roc_value, col=c("#1c61b6"), lwd=2)
 
 #for reproducibility purposes.

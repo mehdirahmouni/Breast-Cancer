@@ -11,6 +11,7 @@ library(rattle)
 library(pROC)
 library(plyr)
 
+rattle()
 #use the variable wbcd to manipulate the dataset
 wbcd <- breast.cancer.wisconsin
 
