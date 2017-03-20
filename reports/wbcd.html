@@ -138,6 +138,7 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
+<p>Before starting the exploration,</p>
 <pre class="r"><code>library('ProjectTemplate')
 load.project()</code></pre>
 <pre class="r"><code>setwd(&quot;C://Users/Dell/Desktop/Dat640/Project/cancer/data&quot;)</code></pre>
@@ -145,7 +146,9 @@ load.project()</code></pre>
 <p>use the variable wbcd to manipulate the dataset</p>
 <pre class="r"><code>wbcd &lt;- read.csv(&quot;C://Users/Dell/Desktop/Dat640/Project/cancer/data/breast_cancer_wisconsin.csv&quot;,
                  header = TRUE)</code></pre>
-<p>check the dataset structure, variables</p>
+<div id="data-exploration" class="section level1">
+<h1>Data exploration</h1>
+<p>check the dataset structure, variables types</p>
 <pre class="r"><code>str(wbcd)</code></pre>
 <pre><code>## 'data.frame':    569 obs. of  33 variables:
 ##  $ id                     : int  842302 842517 84300903 84348301 84358402 843786 844359 84458202 844981 84501001 ...
@@ -181,7 +184,32 @@ load.project()</code></pre>
 ##  $ symmetry_worst         : num  0.46 0.275 0.361 0.664 0.236 ...
 ##  $ fractal_dimension_worst: num  0.1189 0.089 0.0876 0.173 0.0768 ...
 ##  $ X                      : logi  NA NA NA NA NA NA ...</code></pre>
-<p>Data exploration</p>
+<p>column names</p>
+<pre class="r"><code>names(wbcd)</code></pre>
+<pre><code>##  [1] &quot;id&quot;                      &quot;diagnosis&quot;              
+##  [3] &quot;radius_mean&quot;             &quot;texture_mean&quot;           
+##  [5] &quot;perimeter_mean&quot;          &quot;area_mean&quot;              
+##  [7] &quot;smoothness_mean&quot;         &quot;compactness_mean&quot;       
+##  [9] &quot;concavity_mean&quot;          &quot;concave.points_mean&quot;    
+## [11] &quot;symmetry_mean&quot;           &quot;fractal_dimension_mean&quot; 
+## [13] &quot;radius_se&quot;               &quot;texture_se&quot;             
+## [15] &quot;perimeter_se&quot;            &quot;area_se&quot;                
+## [17] &quot;smoothness_se&quot;           &quot;compactness_se&quot;         
+## [19] &quot;concavity_se&quot;            &quot;concave.points_se&quot;      
+## [21] &quot;symmetry_se&quot;             &quot;fractal_dimension_se&quot;   
+## [23] &quot;radius_worst&quot;            &quot;texture_worst&quot;          
+## [25] &quot;perimeter_worst&quot;         &quot;area_worst&quot;             
+## [27] &quot;smoothness_worst&quot;        &quot;compactness_worst&quot;      
+## [29] &quot;concavity_worst&quot;         &quot;concave.points_worst&quot;   
+## [31] &quot;symmetry_worst&quot;          &quot;fractal_dimension_worst&quot;
+## [33] &quot;X&quot;</code></pre>
+<p>number of rows</p>
+<pre class="r"><code>nrow(wbcd)</code></pre>
+<pre><code>## [1] 569</code></pre>
+<p>number of columns</p>
+<pre class="r"><code>ncol(wbcd)</code></pre>
+<pre><code>## [1] 33</code></pre>
+<p>top six rows</p>
 <pre class="r"><code>head((wbcd),6)</code></pre>
 <pre><code>##         id diagnosis radius_mean texture_mean perimeter_mean area_mean
 ## 1   842302         M       17.99        10.38         122.80    1001.0
@@ -239,6 +267,72 @@ load.project()</code></pre>
 ## 4                 0.17300 NA
 ## 5                 0.07678 NA
 ## 6                 0.12440 NA</code></pre>
+<p>last six rows</p>
+<pre class="r"><code>tail((wbcd),6)</code></pre>
+<pre><code>##         id diagnosis radius_mean texture_mean perimeter_mean area_mean
+## 564 926125         M       20.92        25.09         143.00    1347.0
+## 565 926424         M       21.56        22.39         142.00    1479.0
+## 566 926682         M       20.13        28.25         131.20    1261.0
+## 567 926954         M       16.60        28.08         108.30     858.1
+## 568 927241         M       20.60        29.33         140.10    1265.0
+## 569  92751         B        7.76        24.54          47.92     181.0
+##     smoothness_mean compactness_mean concavity_mean concave.points_mean
+## 564         0.10990          0.22360        0.31740             0.14740
+## 565         0.11100          0.11590        0.24390             0.13890
+## 566         0.09780          0.10340        0.14400             0.09791
+## 567         0.08455          0.10230        0.09251             0.05302
+## 568         0.11780          0.27700        0.35140             0.15200
+## 569         0.05263          0.04362        0.00000             0.00000
+##     symmetry_mean fractal_dimension_mean radius_se texture_se perimeter_se
+## 564        0.2149                0.06879    0.9622      1.026        8.758
+## 565        0.1726                0.05623    1.1760      1.256        7.673
+## 566        0.1752                0.05533    0.7655      2.463        5.203
+## 567        0.1590                0.05648    0.4564      1.075        3.425
+## 568        0.2397                0.07016    0.7260      1.595        5.772
+## 569        0.1587                0.05884    0.3857      1.428        2.548
+##     area_se smoothness_se compactness_se concavity_se concave.points_se
+## 564  118.80      0.006399        0.04310      0.07845           0.02624
+## 565  158.70      0.010300        0.02891      0.05198           0.02454
+## 566   99.04      0.005769        0.02423      0.03950           0.01678
+## 567   48.55      0.005903        0.03731      0.04730           0.01557
+## 568   86.22      0.006522        0.06158      0.07117           0.01664
+## 569   19.15      0.007189        0.00466      0.00000           0.00000
+##     symmetry_se fractal_dimension_se radius_worst texture_worst
+## 564     0.02057             0.006213       24.290         29.41
+## 565     0.01114             0.004239       25.450         26.40
+## 566     0.01898             0.002498       23.690         38.25
+## 567     0.01318             0.003892       18.980         34.12
+## 568     0.02324             0.006185       25.740         39.42
+## 569     0.02676             0.002783        9.456         30.37
+##     perimeter_worst area_worst smoothness_worst compactness_worst
+## 564          179.10     1819.0          0.14070           0.41860
+## 565          166.10     2027.0          0.14100           0.21130
+## 566          155.00     1731.0          0.11660           0.19220
+## 567          126.70     1124.0          0.11390           0.30940
+## 568          184.60     1821.0          0.16500           0.86810
+## 569           59.16      268.6          0.08996           0.06444
+##     concavity_worst concave.points_worst symmetry_worst
+## 564          0.6599               0.2542         0.2929
+## 565          0.4107               0.2216         0.2060
+## 566          0.3215               0.1628         0.2572
+## 567          0.3403               0.1418         0.2218
+## 568          0.9387               0.2650         0.4087
+## 569          0.0000               0.0000         0.2871
+##     fractal_dimension_worst  X
+## 564                 0.09873 NA
+## 565                 0.07115 NA
+## 566                 0.06637 NA
+## 567                 0.07820 NA
+## 568                 0.12400 NA
+## 569                 0.07039 NA</code></pre>
+<p>outcome distribution</p>
+<pre class="r"><code>table(wbcd$diagnosis)</code></pre>
+<pre><code>## 
+##   B   M 
+## 357 212</code></pre>
+</div>
+<div id="data-transformation" class="section level1">
+<h1>Data transformation</h1>
 <p>impute id, X</p>
 <pre class="r"><code>wbcd$id &lt;- NULL
 wbcd$X &lt;- NULL</code></pre>
@@ -554,6 +648,7 @@ legend(&quot;bottom&quot;, legend = roc_value, col=c(&quot;#1c61b6&quot;), lwd=2
 ## [34] htmltools_0.3.5    MASS_7.3-45        assertthat_0.1    
 ## [37] pbkrtest_0.4-6     colorspace_1.3-2   quantreg_5.29     
 ## [40] stringi_1.1.2      lazyeval_0.2.0     munsell_0.4.3</code></pre>
+</div>
 
 
 
