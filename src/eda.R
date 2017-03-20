@@ -36,6 +36,7 @@ sapply(wbcd,skewness) #skewness
 sapply(wbcd,kurtosis) #kurtosis
 
 #histogram plots
+
 wbcd <- wbcd[, -1] %>%
   gather(measure, value, radius_mean:fractal_dimension_worst)
 
@@ -51,20 +52,26 @@ ggplot(data = wbcd, aes(x = value, fill = diagnosis, color = diagnosis)) +
 #------------------------------------------------#
 
 #impute id, X 
+
 wbcd$id <- NULL
+
 wbcd$X <- NULL
 
 #assign Benign, Malignant to diagnosis and change type to factor
+
 wbcd$diagnosis <- factor(wbcd$diagnosis, levels = c("B", "M"),
                          labels = c("Benign", "Malignant"))
 
 #verify transformation 
+
 str(wbcd)
 
 #check number of observations and percentage
+
 cbind(Frequency = table(wbcd$diagnosis), Percentage = (prop.table(table(wbcd$diagnosis))* 100))
 
 #data summary
+
 summary(wbcd)
 
 #------------------------------------------------#
@@ -72,6 +79,7 @@ summary(wbcd)
 #------------------------------------------------#
 
 #ensure reproducibility with set.seed()
+
 set.seed(1)
 
 #build training/testing sets, 70% training, 30% testing
