@@ -121,7 +121,7 @@ sapply(wbcd,kurtosis)
 
 histogram plots
 
-```{r}
+```{r echo=FALSE}
 wbcd <- wbcd[, -1] %>%
   gather(measure, value, radius_mean:fractal_dimension_worst)
 
