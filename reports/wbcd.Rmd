@@ -6,7 +6,11 @@ output:
   html_document: default
  ---
 
-Before starting the exploration, 
+#Load ProjectTemplate() library
+
+
+First we need to load the project which will automatically load the dataset. 
+
 
 ```{r, message=FALSE, warning=FALSE}
 library('ProjectTemplate')
@@ -22,18 +26,33 @@ setwd("C://Users/Dell/Desktop/Dat640/Project/cancer/data")
 Load libraries
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-library(caret)
-library(randomForest)
-library(gbm)
-library(rattle)
-library(pROC)
-library(plyr)
-library(e1071)
-library(fBasics)
-library(Hmisc)
-library(base)
-library(tidyr)
-library(ggplot2)
+if (!require(caret)) install.packages("caret",dependencies=TRUE)
+if (!require(randomForest)) install.packages("randomForest",dependencies=TRUE)
+if (!require(gbm)) install.packages("gbm",dependencies=TRUE)
+if (!require(rattle)) install.packages("rattle",dependencies=TRUE)
+if (!require(pROC)) install.packages("pROC",dependencies=TRUE)
+if (!require(plyr)) install.packages("plyr",dependencies=TRUE)
+if (!require(e1071)) install.packages("e1071",dependencies=TRUE)
+if (!require(fBasics)) install.packages("fBasics",dependencies=TRUE)
+if (!require(Hmisc)) install.packages("Hmisc",dependencies=TRUE)
+if (!require(base)) install.packages("base",dependencies=TRUE)
+if (!require(tidyr)) install.packages("tidyr",dependencies=TRUE)
+if (!require(ggplot2)) install.packages("ggplot2",dependencies=TRUE)
+if (!require(reshape2)) install.packages("reshape2",dependencies=TRUE)
+
+require(caret)
+require(randomForest)
+require(gbm)
+require(rattle)
+require(pROC)
+require(plyr)
+require(e1071)
+require(fBasics)
+require(Hmisc)
+require(base)
+require(tidyr)
+require(ggplot2)
+require(reshape2)
 ```
 
 use the variable wbcd to manipulate the dataset
@@ -52,19 +71,19 @@ check the dataset structure, variables types
 str(wbcd)
 ```
 
-column names
+find column names
 
 ```{r, echo=TRUE}
 names(wbcd)
 ```
 
-number of rows
+dataset number of rows
 
 ```{r}
 nrow(wbcd)
 ```
 
-number of columns
+dataset number of columns
 
 ```{r}
 ncol(wbcd)
@@ -110,32 +129,37 @@ colnames(wbcd)[colSums(is.na(wbcd)) > 0]
 ```
 
 skewness
+
 ```{r warning= FALSE, message= FALSE}
 sapply(wbcd,skewness) 
 ```
 
 kurtosis
+
 ```{r warning=FALSE, message=FALSE}
 sapply(wbcd,kurtosis)
 ```
 
-histogram plots
+data visualization using histogram plots
 
-```{r echo=FALSE}
-wbcd <- wbcd[, -1] %>%
-  gather(measure, value, radius_mean:fractal_dimension_worst)
+```{r echo=FALSE, warning=FALSE, message=FALSE, out.width = '\\maxwidth'}
+wbcd_hist <- melt(wbcd[,-c(1,33)])
 
-ggplot(data = wbcd, aes(x = value, fill = diagnosis, color = diagnosis)) +
-  geom_density(alpha = 0.3, size = 1) +
-  geom_rug() +
-  scale_fill_brewer(palette = "Set2") +
-  scale_color_brewer(palette = "Set2") +
-  facet_wrap( ~ measure, scales = "free_y", ncol = 3)
+ggplot(wbcd_hist,aes(x = value, fill = diagnosis, color = diagnosis)) + 
+  facet_wrap(~variable,scales = "free_x") + 
+  geom_histogram(bins = 10)
 ```
 
-
 #Data transformation
- 
+
+load the dataset again, because after the plot we have a completly different dataset 
+
+
+```{r}
+wbcd <- read.csv("C://Users/Dell/Desktop/Dat640/Project/cancer/data/breast_cancer_wisconsin.csv",
+                 header = TRUE)
+```
+
 impute id, X 
 
 ```{r}
@@ -168,14 +192,15 @@ data summary
 summary(wbcd)
 ```
 
-build the model
+#Model building
+
 ensure reproducibility with set.seed()
 
 ```{r}
 set.seed(1)
 ```
 
-build training/testing sets, 70% training, 30% testing
+split the dataset into training/tersting (70% training, 30% testing)
 
 ```{r}
 inTrain <- createDataPartition(wbcd$diagnosis, p=0.7, list=FALSE)
@@ -196,8 +221,7 @@ outcome distribution in the testing set
 table(testing$diagnosis)
 ```
 
-build a random forest model using default parameters
-in the caret package
+build a random forest model using the caret package
 
 ```{r}
 set.seed(1)
@@ -216,6 +240,8 @@ pred_test <- predict(rf_model, testing)
 confusionMatrix(pred_test, testing$diagnosis, positive = "Malignant")
 ```
 
+#Model tuning 
+
 tune Rf model to find best mtry
 using cross-validation
 
@@ -231,7 +257,7 @@ rf_tune_model
 rf_tune_model$finalModel
 ```
 
-Plot for the new (tuned) mtry value
+plot the new (tuned) mtry value
 
 ```{r}
 plot(rf_tune_model)
@@ -244,7 +270,9 @@ pred_tuned_test <- predict(rf_tune_model, testing)
 confusionMatrix(pred_tuned_test, testing$diagnosis, positive="Malignant")
 ```
 
-variable importance
+#Other performance measures (Variable importance, ROC curve)
+
+variable importance plot
 
 ```{r}
 rf_var <- varImp(rf_tune_model)
@@ -265,7 +293,7 @@ legend("bottom", legend = roc_value, col=c("#1c61b6"), lwd=2)
 ```
 
 
-Print SessionInfo(), to enable reproducibility
+print SessionInfo(), to enable reproducibility
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 sessionInfo()

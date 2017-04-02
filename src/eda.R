@@ -16,6 +16,7 @@ library(Hmisc)
 library(base)
 library(tidyr)
 library(ggplot2)
+library(reshape2)
 
 #use the variable wbcd to manipulate the dataset
 
@@ -37,19 +38,17 @@ sapply(wbcd,kurtosis) #kurtosis
 
 #histogram plots
 
-wbcd <- wbcd[, -1] %>%
-  gather(measure, value, radius_mean:fractal_dimension_worst)
+wbcd_hist <- melt(wbcd[,-c(1,33)])
 
-ggplot(data = wbcd, aes(x = value, fill = diagnosis, color = diagnosis)) +
-  geom_density(alpha = 0.3, size = 1) +
-  geom_rug() +
-  scale_fill_brewer(palette = "Set2") +
-  scale_color_brewer(palette = "Set2") +
-  facet_wrap( ~ measure, scales = "free_y", ncol = 3)
+ggplot(wbcd_hist,aes(x = value, fill = diagnosis, color = diagnosis)) + 
+  facet_wrap(~variable,scales = "free_x") + 
+  geom_histogram(bins = 10)
 
 #------------------------------------------------#
 #data transformation                             #    
 #------------------------------------------------#
+
+wbcd <- breast.cancer.wisconsin
 
 #impute id, X 
 
@@ -68,7 +67,8 @@ str(wbcd)
 
 #check number of observations and percentage
 
-cbind(Frequency = table(wbcd$diagnosis), Percentage = (prop.table(table(wbcd$diagnosis))* 100))
+cbind(Frequency = table(wbcd$diagnosis), 
+      Percentage = (prop.table(table(wbcd$diagnosis))* 100))
 
 #data summary
 
@@ -130,7 +130,8 @@ grid <- expand.grid(mtry = c(1, 2, 3, 5, 7, 10, 15, 20, 30))
 
 set.seed(1)
 
-rf_tune_model <- train(diagnosis ~ ., data=training, method="rf", tuneGrid = grid, trControl = ctrl)
+rf_tune_model <- train(diagnosis ~ ., data=training, 
+                       method="rf", tuneGrid = grid, trControl = ctrl)
 
 rf_tune_model
 
@@ -170,4 +171,3 @@ legend("bottom", legend = roc_value, col=c("#1c61b6"), lwd=2)
 #for reproducibility purposes
 
 sessionInfo()
-
