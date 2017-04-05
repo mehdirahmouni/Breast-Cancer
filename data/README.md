@@ -1,1 +1,1 @@
-Here you'll store your raw data files. If they are encoded in a supported file format, they'll automatically be loaded when you call `load.project()`.
+This folder contains the dataset used in the project, which will be automatically loaded with: load.project() command.
