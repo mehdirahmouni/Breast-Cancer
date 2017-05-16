@@ -1,4 +1,4 @@
-# Breat Cancer outcome using random frests, caret() package
+# Breat Cancer outcome using random forests, caret() package
 
 This project is about building a predictive model for the Breast Cancer (Wisconsin) dataset, using random forests.
 
